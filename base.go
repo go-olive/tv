@@ -1,24 +1,24 @@
 package tv
 
 import (
-	"errors"
+	"fmt"
 	"net/url"
 	"strings"
 
 	"golang.org/x/net/publicsuffix"
 )
 
-type Base struct{}
+type base struct{}
 
-func (b *Base) Name() string {
+func (b *base) Name() string {
 	return "undefined"
 }
 
-func (b *Base) Snap(*Tv) (*Info, error) {
-	return nil, errors.New("not implemented")
+func (b *base) Snap(tv *Tv) error {
+	return fmt.Errorf("site(ID = %s) Snap Method not implemented", tv.SiteID)
 }
 
-func (b *Base) Permit(roomUrl RoomUrl) *Tv {
+func (b *base) Permit(roomUrl RoomUrl) *Tv {
 	u, err := url.Parse(string(roomUrl))
 	if err != nil {
 		return nil

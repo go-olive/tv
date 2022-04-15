@@ -20,7 +20,7 @@ func init() {
 }
 
 type huya struct {
-	Base
+	base
 }
 
 func (this *huya) Snap(tv *Tv) error {

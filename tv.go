@@ -1,6 +1,7 @@
 package tv
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 
@@ -28,16 +29,46 @@ type Info struct {
 	streamerNameSet bool
 }
 
-func (i *Info) StreamUrl() (string, bool) {
-	return i.streamUrl, i.roomOn
+func (tv *Tv) StreamUrl() (string, bool) {
+	if tv == nil || tv.Info == nil {
+		return "", false
+	}
+	return tv.streamUrl, tv.roomOn
 }
 
-func (i *Info) RoomName() (string, bool) {
-	return i.roomName, i.roomNameSet
+func (tv *Tv) RoomName() (string, bool) {
+	if tv == nil || tv.Info == nil {
+		return "", false
+	}
+	return tv.roomName, tv.roomNameSet
 }
 
-func (i *Info) StreamerName() (string, bool) {
-	return i.streamerName, i.streamerNameSet
+func (tv *Tv) StreamerName() (string, bool) {
+	if tv == nil || tv.Info == nil {
+		return "", false
+	}
+	return tv.streamerName, tv.streamerNameSet
+}
+
+func (tv *Tv) String() string {
+	sb := &strings.Builder{}
+	sb.WriteString("Powered by go-olive/tv\n")
+	sb.WriteString(format("SiteID", tv.SiteID))
+	sb.WriteString(format("RoomID", tv.RoomID))
+	if roomName, ok := tv.RoomName(); ok {
+		sb.WriteString(format("RoomName", roomName))
+	}
+	if streamerName, ok := tv.StreamerName(); ok {
+		sb.WriteString(format("Streamer", streamerName))
+	}
+	if streamUrl, ok := tv.StreamUrl(); ok {
+		sb.WriteString(format("StreamUrl", streamUrl))
+	}
+	return sb.String()
+}
+
+func format(k, v string) string {
+	return fmt.Sprintf("  %-12s%-s\n", k, v)
 }
 
 type Streamer interface {
