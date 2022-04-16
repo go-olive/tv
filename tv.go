@@ -11,8 +11,12 @@ import (
 type Tv struct {
 	SiteID string
 	RoomID string
-
+	*Parms
 	*Info
+}
+
+type Parms struct {
+	Cookie string
 }
 
 type Option func(*Tv) error

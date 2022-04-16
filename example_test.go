@@ -11,7 +11,7 @@ func ExampleTv() {
 	tv, err := tv.Snap(&tv.Tv{
 		SiteID: "huya",
 		RoomID: "518512",
-	})
+	}, nil)
 
 	if err != nil {
 		println(err.Error())
@@ -22,7 +22,7 @@ func ExampleTv() {
 }
 
 func ExampleRoomUrl() {
-	tv, err := tv.Snap(tv.RoomUrl("https://www.huya.com/518512"))
+	tv, err := tv.Snap(tv.RoomUrl("https://www.huya.com/518512"), nil)
 	if err != nil {
 		println(err.Error())
 		return

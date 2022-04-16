@@ -29,11 +29,12 @@ func Sniff(siteID string) (Site, bool) {
 	return s.(Site), ok
 }
 
-func Snap(streamer Streamer) (*Tv, error) {
+func Snap(streamer Streamer, parms *Parms) (*Tv, error) {
 	tv := streamer.Stream()
 	if tv == nil {
 		return nil, errors.New("streamer not valid")
 	}
+	tv.Parms = parms
 	site, ok := Sniff(tv.SiteID)
 	if !ok {
 		return nil, fmt.Errorf("site(ID = %s) not supported", tv.SiteID)
