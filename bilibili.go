@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	RegisterSite("bilibili", &bilibili{})
+	registerSite("bilibili", &bilibili{})
 }
 
 type bilibili struct {

@@ -15,7 +15,7 @@ type Site interface {
 	Permit(RoomUrl) *Tv
 }
 
-func RegisterSite(siteID string, site Site) {
+func registerSite(siteID string, site Site) {
 	if _, dup := sites.LoadOrStore(siteID, site); dup {
 		panic("site already registered")
 	}

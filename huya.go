@@ -16,7 +16,7 @@ import (
 )
 
 func init() {
-	RegisterSite("huya", &huya{})
+	registerSite("huya", &huya{})
 }
 
 type huya struct {
