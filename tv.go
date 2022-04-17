@@ -51,6 +51,9 @@ type Info struct {
 }
 
 func (tv *Tv) Refresh() {
+	if tv == nil {
+		return
+	}
 	site, ok := Sniff(tv.SiteID)
 	if !ok {
 		return

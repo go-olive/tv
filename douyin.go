@@ -31,7 +31,7 @@ func (this *douyin) Snap(tv *Tv) error {
 }
 
 func (this *douyin) set(tv *Tv) error {
-	if tv.Parms.Cookie == "" {
+	if tv.Parms == nil || tv.Parms.Cookie == "" {
 		return fmt.Errorf("douyin cookie not configured")
 	}
 	req := &util.HttpRequest{
