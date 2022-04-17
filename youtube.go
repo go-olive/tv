@@ -25,58 +25,47 @@ func (this *youtube) Snap(tv *Tv) error {
 		Timestamp: time.Now().Unix(),
 	}
 
-	options := []Option{
-		this.setRoomOn(),
-		this.setStreamURL(),
+	streamID, err := this.setRoomOn(tv)
+	if err != nil {
+		return err
 	}
+	return this.setStreamURL(tv, streamID)
+}
 
-	for _, option := range options {
-		if err := option(tv); err != nil {
-			return err
-		}
+func (this *youtube) setRoomOn(tv *Tv) (string, error) {
+	channelURL := fmt.Sprintf("https://www.youtube.com/channel/%s", tv.RoomID)
+	content, err := util.GetURLContent(channelURL)
+	if err != nil {
+		return "", err
 	}
+	tv.roomOn = strings.Contains(content, `icon":{"iconType":"LIVE"}}`)
+	if !tv.roomOn {
+		return "", nil
+	}
+	streamID, err := util.Match(`"videoRenderer":{"videoId":"([^"]+)",`, content)
+	if err != nil {
+		return "", err
+	}
+	return streamID, nil
+}
 
+func (this *youtube) setStreamURL(tv *Tv, streamID string) error {
+	if !tv.roomOn {
+		return nil
+	}
+	// youtube possibly have multiple lives in one channel,
+	// curruently the program returns the first one.
+	roomURL := fmt.Sprintf("https://www.youtube.com/watch?v=%s", streamID)
+	tv.streamUrl = roomURL
+	roomContent, err := util.GetURLContent(roomURL)
+	if err != nil {
+		return err
+	}
+	title, err := util.Match(`name="title" content="([^"]+)"`, roomContent)
+	if err != nil {
+		return err
+	}
+	tv.roomName = title
+	tv.roomNameSet = true
 	return nil
-}
-
-func (this *youtube) setRoomOn() Option {
-	return func(tv *Tv) error {
-		channelURL := fmt.Sprintf("https://www.youtube.com/channel/%s", tv.RoomID)
-		content, err := util.GetURLContent(channelURL)
-		if err != nil {
-			return err
-		}
-		tv.roomOn = strings.Contains(content, `icon":{"iconType":"LIVE"}}`)
-		if !tv.roomOn {
-			return nil
-		}
-		streamID, err := util.Match(`"videoRenderer":{"videoId":"([^"]+)",`, content)
-		if err != nil {
-			return err
-		}
-		tv.RoomID = streamID
-		return nil
-	}
-}
-
-func (this *youtube) setStreamURL() Option {
-	return func(tv *Tv) error {
-		if !tv.roomOn {
-			return nil
-		}
-		// youtube possibly have multiple lives in one channel,
-		// curruently the program returns the first one.
-		roomURL := fmt.Sprintf("https://www.youtube.com/watch?v=%s", tv.RoomID)
-		tv.streamUrl = roomURL
-		roomContent, err := util.GetURLContent(roomURL)
-		if err != nil {
-			return err
-		}
-		title, err := util.Match(`name="title" content="([^"]+)"`, roomContent)
-		if err != nil {
-			return err
-		}
-		tv.roomName = title
-		return nil
-	}
 }
