@@ -34,7 +34,9 @@ func Snap(streamer Streamer, parms *Parms) (*Tv, error) {
 	if tv == nil {
 		return nil, errors.New("streamer not valid")
 	}
-	tv.Parms = parms
+	if parms != nil {
+		tv.Parms = parms
+	}
 	site, ok := Sniff(tv.SiteID)
 	if !ok {
 		return nil, fmt.Errorf("site(ID = %s) not supported", tv.SiteID)

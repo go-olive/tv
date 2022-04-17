@@ -15,6 +15,14 @@ type Tv struct {
 	*Info
 }
 
+func NewTv(siteID, roomID string) *Tv {
+	tv := &Tv{
+		SiteID: siteID,
+		RoomID: roomID,
+	}
+	return tv
+}
+
 type Parms struct {
 	Cookie string
 }
@@ -31,6 +39,14 @@ type Info struct {
 	roomNameSet     bool
 	streamerName    string
 	streamerNameSet bool
+}
+
+func (tv *Tv) Refresh() {
+	site, ok := Sniff(tv.SiteID)
+	if !ok {
+		return
+	}
+	site.Snap(tv)
 }
 
 func (tv *Tv) StreamUrl() (string, bool) {
@@ -84,6 +100,10 @@ func (tv *Tv) Stream() *Tv {
 }
 
 type RoomUrl string
+
+func NewRoomUrl(roomUrl string) RoomUrl {
+	return RoomUrl(roomUrl)
+}
 
 func (this RoomUrl) SiteID() string {
 	u, err := url.Parse(string(this))
