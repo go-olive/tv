@@ -8,7 +8,9 @@ import (
 	"golang.org/x/net/publicsuffix"
 )
 
-type base struct{}
+type base struct {
+	*Tv
+}
 
 func (b *base) Name() string {
 	return "undefined"
