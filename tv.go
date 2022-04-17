@@ -8,6 +8,15 @@ import (
 	"golang.org/x/net/publicsuffix"
 )
 
+var _ ITv = (*Tv)(nil)
+
+type ITv interface {
+	Refresh()
+	StreamUrl() (string, bool)
+	RoomName() (string, bool)
+	StreamerName() (string, bool)
+}
+
 type Tv struct {
 	SiteID string
 	RoomID string
