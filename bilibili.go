@@ -1,7 +1,6 @@
 package tv
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -65,7 +64,7 @@ func (this *bilibili) setRoomOn() Option {
 			return err
 		}
 		if roomInit.Code != 0 || roomInit.Data.LiveStatus != 1 {
-			return errors.New("not on air")
+			return nil
 		}
 
 		tv.RoomID = fmt.Sprint(roomInit.Data.RoomID)
