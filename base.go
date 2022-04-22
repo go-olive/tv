@@ -18,14 +18,14 @@ func (b *base) Snap(tv *Tv) error {
 	return fmt.Errorf("site(ID = %s) Snap Method not implemented", tv.SiteID)
 }
 
-func (b *base) Permit(roomUrl RoomUrl) *Tv {
+func (b *base) Permit(roomUrl RoomUrl) (*Tv, error) {
 	u, err := url.Parse(string(roomUrl))
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	eTLDPO, err := publicsuffix.EffectiveTLDPlusOne(u.Hostname())
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	siteID := strings.Split(eTLDPO, ".")[0]
 	base := strings.TrimPrefix(u.Path, "/")
@@ -33,5 +33,5 @@ func (b *base) Permit(roomUrl RoomUrl) *Tv {
 	return &Tv{
 		SiteID: siteID,
 		RoomID: roomID,
-	}
+	}, nil
 }

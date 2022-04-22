@@ -1,17 +1,22 @@
 package tv
 
 import (
+	"errors"
 	"fmt"
+	"log"
 	"net/url"
 	"strings"
 
 	"golang.org/x/net/publicsuffix"
 )
 
-var _ ITv = (*Tv)(nil)
+var (
+	_ ITv = (*Tv)(nil)
+
+	ErrNotSupported = errors.New("streamer not supported")
+)
 
 type ITv interface {
-	Refresh()
 	StreamUrl() (string, bool)
 	RoomName() (string, bool)
 	StreamerName() (string, bool)
@@ -20,23 +25,50 @@ type ITv interface {
 type Tv struct {
 	SiteID string
 	RoomID string
-	*Parms
+
+	cookie string
+
 	*Info
 }
 
-func NewTv(siteID, roomID string) *Tv {
-	tv := &Tv{
+func New(siteID, roomID string, opts ...Option) (*Tv, error) {
+	_, valid := Sniff(siteID)
+	if !valid {
+		return nil, ErrNotSupported
+	}
+
+	t := &Tv{
 		SiteID: siteID,
 		RoomID: roomID,
 	}
-	return tv
+	for _, opt := range opts {
+		opt(t)
+	}
+	return t, nil
 }
 
-type Parms struct {
-	Cookie string
+func NewWithUrl(roomUrl string, opts ...Option) (*Tv, error) {
+	u := RoomUrl(roomUrl)
+	t, err := u.Stream()
+	if err != nil {
+		log.Println(err.Error())
+		return nil, ErrNotSupported
+	}
+
+	for _, opt := range opts {
+		opt(t)
+	}
+	return t, nil
 }
 
 type Option func(*Tv) error
+
+func SetCookie(cookie string) Option {
+	return func(t *Tv) error {
+		t.cookie = cookie
+		return nil
+	}
+}
 
 type Info struct {
 	Timestamp int64
@@ -50,7 +82,7 @@ type Info struct {
 	streamerNameSet bool
 }
 
-func (tv *Tv) Refresh() {
+func (tv *Tv) Snap() {
 	if tv == nil {
 		return
 	}
@@ -59,6 +91,17 @@ func (tv *Tv) Refresh() {
 		return
 	}
 	site.Snap(tv)
+}
+
+func (tv *Tv) SiteName() string {
+	if tv == nil {
+		return ""
+	}
+	site, ok := Sniff(tv.SiteID)
+	if !ok {
+		return ""
+	}
+	return site.Name()
 }
 
 func (tv *Tv) StreamUrl() (string, bool) {
@@ -86,6 +129,7 @@ func (tv *Tv) String() string {
 	sb := &strings.Builder{}
 	sb.WriteString("Powered by go-olive/tv\n")
 	sb.WriteString(format("SiteID", tv.SiteID))
+	sb.WriteString(format("SiteName", tv.SiteName()))
 	sb.WriteString(format("RoomID", tv.RoomID))
 	if roomName, ok := tv.RoomName(); ok {
 		sb.WriteString(format("RoomName", roomName))
@@ -103,19 +147,7 @@ func format(k, v string) string {
 	return fmt.Sprintf("  %-12s%-s\n", k, v)
 }
 
-type Streamer interface {
-	Stream() *Tv
-}
-
-func (tv *Tv) Stream() *Tv {
-	return tv
-}
-
 type RoomUrl string
-
-func NewRoomUrl(roomUrl string) RoomUrl {
-	return RoomUrl(roomUrl)
-}
 
 func (this RoomUrl) SiteID() string {
 	u, err := url.Parse(string(this))
@@ -130,10 +162,10 @@ func (this RoomUrl) SiteID() string {
 	return siteID
 }
 
-func (this RoomUrl) Stream() *Tv {
+func (this RoomUrl) Stream() (*Tv, error) {
 	site, ok := Sniff(this.SiteID())
 	if !ok {
-		return nil
+		return nil, nil
 	}
 	return site.Permit(this)
 }

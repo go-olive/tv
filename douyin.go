@@ -1,6 +1,7 @@
 package tv
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/url"
@@ -9,6 +10,10 @@ import (
 
 	"github.com/go-olive/tv/util"
 	jsoniter "github.com/json-iterator/go"
+)
+
+var (
+	ErrCookieNotSet = errors.New("cookie not configured")
 )
 
 func init() {
@@ -31,8 +36,8 @@ func (this *douyin) Snap(tv *Tv) error {
 }
 
 func (this *douyin) set(tv *Tv) error {
-	if tv.Parms == nil || tv.Parms.Cookie == "" {
-		return fmt.Errorf("douyin cookie not configured")
+	if tv.cookie == "" {
+		return ErrCookieNotSet
 	}
 	req := &util.HttpRequest{
 		URL:          fmt.Sprintf("https://live.douyin.com/%s", tv.RoomID),
@@ -42,7 +47,7 @@ func (this *douyin) set(tv *Tv) error {
 		Header: map[string]string{
 			"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36 Edg/94.0.992.38",
 			"referer":    "https://live.douyin.com/",
-			"cookie":     tv.Parms.Cookie,
+			"cookie":     tv.cookie,
 		},
 	}
 	var err error

@@ -1,8 +1,6 @@
 package tv
 
 import (
-	"errors"
-	"fmt"
 	"sync"
 )
 
@@ -12,7 +10,7 @@ var sites sync.Map
 type Site interface {
 	Name() string
 	Snap(*Tv) error
-	Permit(RoomUrl) *Tv
+	Permit(RoomUrl) (*Tv, error)
 }
 
 func registerSite(siteID string, site Site) {
@@ -27,22 +25,4 @@ func Sniff(siteID string) (Site, bool) {
 		return nil, ok
 	}
 	return s.(Site), ok
-}
-
-func Snap(streamer Streamer, parms *Parms) (*Tv, error) {
-	tv := streamer.Stream()
-	if tv == nil {
-		return nil, errors.New("streamer not valid")
-	}
-	if parms != nil {
-		tv.Parms = parms
-	}
-	site, ok := Sniff(tv.SiteID)
-	if !ok {
-		return nil, fmt.Errorf("site(ID = %s) not supported", tv.SiteID)
-	}
-	if err := site.Snap(tv); err != nil {
-		return nil, err
-	}
-	return tv, nil
 }
