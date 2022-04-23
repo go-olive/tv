@@ -17,6 +17,7 @@ var (
 )
 
 type ITv interface {
+	Snap()
 	StreamUrl() (string, bool)
 	RoomName() (string, bool)
 	StreamerName() (string, bool)
