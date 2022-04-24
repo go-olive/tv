@@ -40,7 +40,7 @@ func (this *twitch) set(tv *Tv) error {
 	}
 
 	tv.streamUrl = roomUrl
-	title, err := util.Match(`<meta name="description" content="([^"]+)"`, content)
+	title, err := util.Match(`"description":"([^"]+)"`, content)
 	if err != nil {
 		return nil
 	}
