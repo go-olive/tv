@@ -66,6 +66,5 @@ func (this *youtube) setStreamURL(tv *Tv, streamID string) error {
 		return err
 	}
 	tv.roomName = title
-	tv.roomNameSet = true
 	return nil
 }

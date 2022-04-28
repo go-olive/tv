@@ -46,7 +46,6 @@ func (this *twitch) set(tv *Tv) error {
 	}
 
 	tv.roomName = title
-	tv.roomNameSet = true
 
 	return nil
 }

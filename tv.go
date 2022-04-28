@@ -10,6 +10,11 @@ import (
 	"golang.org/x/net/publicsuffix"
 )
 
+const (
+	EmptyRoomName     = ""
+	EmptyStreamerName = ""
+)
+
 var (
 	_ ITv = (*Tv)(nil)
 
@@ -74,13 +79,10 @@ func SetCookie(cookie string) Option {
 type Info struct {
 	Timestamp int64
 
-	streamUrl string
-	roomOn    bool
-
-	roomName        string
-	roomNameSet     bool
-	streamerName    string
-	streamerNameSet bool
+	streamUrl    string
+	roomOn       bool
+	roomName     string
+	streamerName string
 }
 
 func (tv *Tv) Snap() {
@@ -116,14 +118,14 @@ func (tv *Tv) RoomName() (string, bool) {
 	if tv == nil || tv.Info == nil {
 		return "", false
 	}
-	return tv.roomName, tv.roomNameSet
+	return tv.roomName, tv.roomName != EmptyRoomName
 }
 
 func (tv *Tv) StreamerName() (string, bool) {
 	if tv == nil || tv.Info == nil {
 		return "", false
 	}
-	return tv.streamerName, tv.streamerNameSet
+	return tv.streamerName, tv.streamerName != EmptyStreamerName
 }
 
 func (tv *Tv) String() string {

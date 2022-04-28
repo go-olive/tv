@@ -136,7 +136,6 @@ func (this *huya) setRoomOn() Option {
 		}
 		if len(titleRes) > 0 {
 			tv.roomName = titleRes[0]
-			tv.roomNameSet = true
 		}
 
 		return nil

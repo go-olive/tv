@@ -87,7 +87,6 @@ func (this *bilibili) setRoomOn() Option {
 		for _, v := range statusInfo.Data {
 			if v.UID == roomInit.Data.UID {
 				tv.roomName = v.Title
-				tv.roomNameSet = true
 			}
 		}
 		return nil
