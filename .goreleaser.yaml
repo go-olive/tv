@@ -7,7 +7,7 @@ before:
 builds:
   - binary: olivetv
 
-    main: ./src/cmd/olivetv
+    main: ./cmd/olivetv
     env:
       - CGO_ENABLED=0
 
