@@ -22,7 +22,7 @@ var (
 )
 
 type ITv interface {
-	Snap()
+	Snap() error
 	StreamUrl() (string, bool)
 	RoomName() (string, bool)
 	StreamerName() (string, bool)
@@ -85,16 +85,16 @@ type Info struct {
 	streamerName string
 }
 
-// Snap takes the latest snapshot of the streamer info.
-func (tv *Tv) Snap() {
+// Snap takes the latest snapshot of the streamer info that could be retrieved individually.
+func (tv *Tv) Snap() error {
 	if tv == nil {
-		return
+		return errors.New("tv is nil")
 	}
 	site, ok := Sniff(tv.SiteID)
 	if !ok {
-		return
+		return fmt.Errorf("site(ID = %s) not supported", tv.SiteID)
 	}
-	site.Snap(tv)
+	return site.Snap(tv)
 }
 
 func (tv *Tv) SiteName() string {
