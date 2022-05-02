@@ -85,6 +85,7 @@ type Info struct {
 	streamerName string
 }
 
+// Snap takes the latest snapshot of the streamer info.
 func (tv *Tv) Snap() {
 	if tv == nil {
 		return
