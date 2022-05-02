@@ -29,7 +29,8 @@ func (b *base) Permit(roomUrl RoomUrl) (*Tv, error) {
 	}
 	siteID := strings.Split(eTLDPO, ".")[0]
 	base := strings.TrimPrefix(u.Path, "/")
-	roomID := strings.Split(base, "/")[0]
+	roomIDTmp := strings.Split(base, "/")
+	roomID := roomIDTmp[len(roomIDTmp)-1]
 	return &Tv{
 		SiteID: siteID,
 		RoomID: roomID,
