@@ -3,7 +3,6 @@ package tv
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/url"
 	"strings"
 
@@ -57,8 +56,8 @@ func NewWithUrl(roomUrl string, opts ...Option) (*Tv, error) {
 	u := RoomUrl(roomUrl)
 	t, err := u.Stream()
 	if err != nil {
-		log.Println(err.Error())
-		return nil, ErrNotSupported
+		err = fmt.Errorf("%+v (err msg = %s)", ErrNotSupported, err.Error())
+		return nil, err
 	}
 
 	for _, opt := range opts {

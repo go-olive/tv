@@ -3,7 +3,6 @@ package tv
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/url"
 	"strings"
 	"time"
@@ -80,7 +79,7 @@ func (this *douyin) set(tv *Tv) error {
 	var streamData douyinStreamData
 	err = jsoniter.UnmarshalFromString(streamDataStr, &streamData)
 	if err != nil {
-		log.Println(err.Error())
+		// log.Println(err.Error())
 		return nil
 	}
 	tv.streamUrl = streamData.Data.Origin.Main.Flv

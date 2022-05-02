@@ -4,7 +4,7 @@
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/go-olive/tv/goreleaser?style=for-the-badge)](https://github.com/go-olive/tv/actions/workflows/release.yml)
 [![Sourcegraph](https://img.shields.io/badge/view%20on-Sourcegraph-brightgreen.svg?style=for-the-badge&logo=sourcegraph)](https://sourcegraph.com/github.com/go-olive/tv)
 
-OliveTV is a CLI utility which gets live streamer's real streaming url along with some other details.
+OliveTV is a CLI utility which gets stream url along with other streamer details.
 
 ## Installation
 

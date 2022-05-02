@@ -1,7 +1,6 @@
 package tv
 
 import (
-	"log"
 	"time"
 
 	"github.com/go-olive/tv/model"
@@ -62,7 +61,6 @@ func (this *kuaishou) set(tv *Tv) error {
 	}
 	var err error
 	if err = req.Send(); err != nil {
-		log.Println(err)
 		return err
 	}
 
