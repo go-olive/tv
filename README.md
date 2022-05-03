@@ -35,7 +35,7 @@ olivetv -sid huya -rid 518512
 | site     | cookie example                                               |
 | -------- | ------------------------------------------------------------ |
 | douyin   | `"__ac_nonce=06245c89100e7ab2dd536; __ac_signature=_02B4Z6wo00f01LjBMSAAAIDBwA.aJ.c4z1C44TWAAEx696;"` |
-| kuaishou | `"did=web_d86297aa2f579589b8abc2594b0ea985"`                 |
+| kuaishou | `"clientid=3; client_key=65890b29; kpn=GAME_ZONE; userId=2832074080; ksliveShowClipTip=true; didv=1651558610000; did=web_e0b9484b9e54432e8cb60673641734bf; Hm_lvt_86a27b7db2c5c0ae37fee4a8a35033ee=1651558613; userId=2832074080; kuaishou.live.web_st=ChRrdWFpc2hvdS5saXZlLndlYi5zdBKgAU23I2W2S8FeExWzD5xSXt3HGrVhP-jGfjXZ6yGgpqNtjhntnw-_7XcGqM7zdI5uwQvUoMWLPYtrJDNSipu3HXoejsaj0VibuLJ2EBneayxBBH2STgnQZ7fzooB-8r5HvskmLZGYWHutuFnw1tg2y5xQcQQaFihc2Le6EnONj4Lerle6a63TTOFYOa8pRRcVLprdmq0YMOvqIYZ5CnEq5lkaEhrHsWfESUHgv806qk-5eqStgCIgoFeVe2MYPP_0i8KkGLcbbx3nYN1rqS7JUfxNZXQ3cgwoBTAB; kuaishou.live.web_ph=9180f279025aaec3e4c5bd0740c4dc100d3a; kuaishou.live.bfb1s=9b8f70844293bed778aade6e0a8f9942"` |
 
 ## API Guide
 
