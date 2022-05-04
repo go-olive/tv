@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-olive/tv/model"
@@ -144,6 +145,10 @@ func (this *kuaishou) setV2(tv *Tv) error {
 		return err
 	}
 	content := string(body)
+
+	if !strings.Contains(content, "直播中") {
+		return nil
+	}
 
 	tv.streamerName, _ = util.Match(`title="([^"]+)" target="_blank"`, content)
 	tv.roomName, _ = util.Match(`title="([^"]+)" class="router-link-exact-active`, content)
