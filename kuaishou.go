@@ -1,6 +1,9 @@
 package tv
 
 import (
+	"io"
+	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/go-olive/tv/model"
@@ -41,14 +44,17 @@ func (this *kuaishou) Snap(tv *Tv) (err error) {
 	tv.Info = &Info{
 		Timestamp: time.Now().Unix(),
 	}
-
-	if err = this.setRoomOn(tv); err != nil {
-		return
-	}
-	return this.setStreamUrl(tv)
+	return this.setV2(tv)
 }
 
-func (this *kuaishou) setStreamUrl(tv *Tv) error {
+func (this *kuaishou) setV1(tv *Tv) error {
+	if err := this.setRoomOnV1(tv); err != nil {
+		return err
+	}
+	return this.setStreamUrlV1(tv)
+}
+
+func (this *kuaishou) setStreamUrlV1(tv *Tv) error {
 	if tv.cookie == "" {
 		return ErrCookieNotSet
 	}
@@ -87,7 +93,7 @@ func (this *kuaishou) setStreamUrl(tv *Tv) error {
 	return nil
 }
 
-func (this *kuaishou) setRoomOn(tv *Tv) error {
+func (this *kuaishou) setRoomOnV1(tv *Tv) error {
 	if tv.cookie == "" {
 		return ErrCookieNotSet
 	}
@@ -116,6 +122,36 @@ func (this *kuaishou) setRoomOn(tv *Tv) error {
 
 	tv.roomOn = ksAG.Data.UserInfo.Living
 	tv.streamerName = ksAG.Data.UserInfo.Name
+
+	return nil
+}
+
+func (this *kuaishou) setV2(tv *Tv) error {
+	if tv.cookie == "" {
+		return ErrCookieNotSet
+	}
+	req, err := http.NewRequest("GET", "https://live.kuaishou.com/profile/"+tv.RoomID, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Add("cookie", tv.cookie)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	content := string(body)
+
+	tv.streamerName, _ = util.Match(`title="([^"]+)" target="_blank"`, content)
+	tv.roomName, _ = util.Match(`title="([^"]+)" class="router-link-exact-active`, content)
+	tv.streamUrl, _ = util.Match(`"url":"([^"]+)"`, content)
+	tv.streamUrl, _ = strconv.Unquote(`"` + tv.streamUrl + `"`)
+	if tv.streamUrl != "" {
+		tv.roomOn = true
+	}
 
 	return nil
 }
