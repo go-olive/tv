@@ -38,6 +38,7 @@ func (this *tiktok) set(tv *Tv) error {
 	if err != nil {
 		return err
 	}
+	defer live.Close()
 	candi := []string{
 		live.Info.StreamURL.FlvPullURL.FullHd1,
 		live.Info.StreamURL.FlvPullURL.Hd1,
