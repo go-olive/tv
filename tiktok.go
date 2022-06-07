@@ -34,16 +34,16 @@ func (this *tiktok) set(tv *Tv) error {
 	}()
 
 	tiktok := gotiktoklive.NewTikTok()
-	live, err := tiktok.TrackUser(tv.RoomID)
+	info, err := tiktok.GetRoomInfo(tv.RoomID)
 	if err != nil {
 		return err
 	}
-	defer live.Close()
+
 	candi := []string{
-		live.Info.StreamURL.FlvPullURL.FullHd1,
-		live.Info.StreamURL.FlvPullURL.Hd1,
-		live.Info.StreamURL.FlvPullURL.Sd1,
-		live.Info.StreamURL.FlvPullURL.Sd2,
+		info.StreamURL.FlvPullURL.FullHd1,
+		info.StreamURL.FlvPullURL.Hd1,
+		info.StreamURL.FlvPullURL.Sd1,
+		info.StreamURL.FlvPullURL.Sd2,
 	}
 	var streamUrl string
 	for _, v := range candi {
@@ -54,8 +54,8 @@ func (this *tiktok) set(tv *Tv) error {
 	}
 
 	if streamUrl != "" {
-		tv.roomName = live.Info.Owner.Nickname + " is LIVE now"
-		tv.streamerName = live.Info.Owner.Nickname
+		tv.roomName = info.Owner.Nickname + " is LIVE now"
+		tv.streamerName = info.Owner.Nickname
 		tv.roomOn = true
 		tv.streamUrl = streamUrl
 	}
