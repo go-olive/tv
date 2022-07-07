@@ -1,6 +1,8 @@
 package util
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -42,4 +44,9 @@ func Match(pattern, content string) (string, error) {
 		return "", errors.New("pattern not found")
 	}
 	return res[0], nil
+}
+
+func GetMd5Hash(text string) string {
+	hash := md5.Sum([]byte(text))
+	return hex.EncodeToString(hash[:])
 }

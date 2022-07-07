@@ -1,11 +1,9 @@
 package tv
 
 import (
-	"crypto/md5"
 	"encoding/base64"
-	"errors"
 	"fmt"
-	"io"
+	"html"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -63,49 +61,55 @@ func (this *huya) streamURL(roomID string) (string, error) {
 	}
 	respBody := fmt.Sprint(req.ResponseData)
 	re := regexp.MustCompile(`liveLineUrl":"([^"]+)",`)
-	submatch := re.FindAllStringSubmatch(respBody, -1)
-	res := make([]string, 0)
-	for _, v := range submatch {
-		res = append(res, string(v[1]))
+	res := re.FindStringSubmatch(respBody)
+	if len(res) > 0 { //有直播链接
+		u := res[1]
+		if len(u) > 0 {
+			decodedRet, _ := base64.StdEncoding.DecodeString(u)
+			decodedUrl := string(decodedRet)
+			if strings.Contains(decodedUrl, "replay") { //重播
+				return "https:" + u, nil
+			} else {
+				liveLineUrl := this.proc(decodedUrl)
+				liveLineUrl = strings.Replace(liveLineUrl, "hls", "flv", -1)
+				liveLineUrl = strings.Replace(liveLineUrl, "m3u8", "flv", -1)
+				return "https:" + liveLineUrl, nil
+			}
+		}
 	}
-	if len(res) < 1 {
-		// 虎牙平台有直播是处于直播中的状态但获取不到直播源的情况，打开网页看直播也是同样的情况。俗称死亡回放。
-		return "", errors.New("find stream url failed")
-	}
-	a, _ := base64.RawStdEncoding.DecodeString(res[0])
-	return this.proc(string(a)), nil
+
+	return "", nil
 }
 
-func (this *huya) proc(in string) string {
-	ib := strings.Split(in, "?")
-	i, b := ib[0], ib[1]
+func (this *huya) proc(e string) string {
+	i := strings.Split(e, "?")[0]
+	b := strings.Split(e, "?")[1]
 	r := strings.Split(i, "/")
-	s := strings.ReplaceAll(r[len(r)-1], ".flv", "")
-	s = strings.ReplaceAll(s, ".m3u8", "")
-	c := strings.SplitN(b, "&", 4)
-	y := c[len(c)-1]
+	re := regexp.MustCompile(".(flv|m3u8)")
+	s := re.ReplaceAllString(r[len(r)-1], "")
+	srcAntiCode := html.UnescapeString(b)
+
+	c := strings.Split(srcAntiCode, "&")
+	cc := c[:0]
 	n := make(map[string]string)
-	for _, v := range c {
-		if v == "" {
-			continue
+	for _, x := range c {
+		if len(x) > 0 {
+			cc = append(cc, x)
+			ss := strings.Split(x, "=")
+			n[ss[0]] = ss[1]
 		}
-		vs := strings.SplitN(v, "=", 2)
-		n[vs[0]] = vs[1]
 	}
-	fm := url.PathEscape(n["fm"])
-	ub, _ := base64.RawStdEncoding.DecodeString(fm)
-	u := string(ub)
+	c = cc
+	fm, _ := url.QueryUnescape(n["fm"])
+	uu, _ := base64.StdEncoding.DecodeString(fm)
+	u := string(uu)
 	p := strings.Split(u, "_")[0]
 	f := strconv.FormatInt(time.Now().UnixNano()/100, 10)
 	l := n["wsTime"]
 	t := "0"
-	h := strings.Join([]string{p, t, s, f, l}, "_")
-	m := md5.New()
-	io.WriteString(m, h)
-	url := fmt.Sprintf("%s?wsSecret=%x&wsTime=%s&u=%s&seqid=%s&%s", i, m.Sum(nil), l, t, f, y)
-	url = "https:" + url
-	url = strings.ReplaceAll(url, "hls", "flv")
-	url = strings.ReplaceAll(url, "m3u8", "flv")
+	h := p + "_" + t + "_" + s + "_" + f + "_" + l
+	m := util.GetMd5Hash(h)
+	url := fmt.Sprintf("%s?wsSecret=%s&wsTime=%s&u=%s&seqid=%s&txyp=%s&fs=%s&sphdcdn=%s&sphdDC=%s&sphd=%s&u=0&t=100&sv=", i, m, l, t, f, n["txyp"], n["fs"], n["sphdcdn"], n["sphdDC"], n["sphd"])
 	return url
 }
 
