@@ -152,6 +152,9 @@ func (this *huya) setStreamURL() Option {
 			return nil
 		}
 		tv.streamUrl, err = this.streamURL(tv.RoomID)
+		if !strings.Contains(tv.streamUrl, "https") {
+			tv.roomOn = false
+		}
 		return
 	}
 }
