@@ -18,6 +18,7 @@ var (
 	_ ITv = (*Tv)(nil)
 
 	ErrNotSupported = errors.New("streamer not supported")
+	ErrSiteInvalid  = errors.New("site invalid")
 )
 
 type ITv interface {
@@ -168,7 +169,7 @@ func (this RoomUrl) SiteID() string {
 func (this RoomUrl) Stream() (*Tv, error) {
 	site, ok := Sniff(this.SiteID())
 	if !ok {
-		return nil, nil
+		return nil, ErrSiteInvalid
 	}
 	return site.Permit(this)
 }
